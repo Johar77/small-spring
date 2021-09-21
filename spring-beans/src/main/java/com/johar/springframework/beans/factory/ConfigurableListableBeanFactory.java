@@ -3,6 +3,7 @@ package com.johar.springframework.beans.factory;
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
+import com.johar.springframework.beans.factory.config.BeanPostProcessor;
 import com.johar.springframework.beans.factory.config.ConfigurableBeanFactory;
 
 /**
@@ -14,4 +15,6 @@ import com.johar.springframework.beans.factory.config.ConfigurableBeanFactory;
  */
 public interface ConfigurableListableBeanFactory extends ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory {
     BeanDefinition getBeanDefinition(String beanName) throws BeansException;
+
+    void preInstantiateSingleton() throws BeansException;
 }

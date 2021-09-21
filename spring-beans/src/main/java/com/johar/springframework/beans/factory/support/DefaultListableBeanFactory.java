@@ -2,6 +2,7 @@ package com.johar.springframework.beans.factory.support;
 
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.factory.ConfigurableListableBeanFactory;
+import com.johar.springframework.beans.factory.DisposableBean;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Since: 1.0.0
  */
 public class DefaultListableBeanFactory extends AbstractAutoWireCapableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
-
 
     private Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
@@ -56,5 +56,10 @@ public class DefaultListableBeanFactory extends AbstractAutoWireCapableBeanFacto
         });
 
         return result;
+    }
+
+    @Override
+    public void preInstantiateSingleton() throws BeansException {
+        beanDefinitionMap.keySet().forEach(this::getBean);
     }
 }

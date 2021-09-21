@@ -1,13 +1,19 @@
 package com.johar.springframework.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.PropertyValue;
 import com.johar.springframework.beans.PropertyValues;
+import com.johar.springframework.beans.factory.DisposableBean;
+import com.johar.springframework.beans.factory.InitializingBean;
+import com.johar.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
+import com.johar.springframework.beans.factory.config.BeanPostProcessor;
 import com.johar.springframework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -18,22 +24,82 @@ import java.util.Optional;
  * @Date: 2021/9/19 17:25
  * @Since: 1.0.0
  */
-public abstract class AbstractAutoWireCapableBeanFactory extends AbstractBeanFactory{
+public abstract class AbstractAutoWireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
     @Override
-    protected Object createBean(String name, BeanDefinition beanDefinition, Object[] args) {
+    protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
         Object bean = null;
         try{
-            bean = createBeanInstance(beanDefinition, name, args);
-            applyPropertyValues(name, bean, beanDefinition);
+            // 创建实例
+            bean = createBeanInstance(beanDefinition, beanName, args);
+            // 填充属性
+            applyPropertyValues(beanName, bean, beanDefinition);
+
+            bean = initializeBean(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
 
-        addSingleton(name, bean);
+        // 注册实现DisposableBean 接口 bean对象
+        registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
+
+        addSingleton(beanName, bean);
         return bean;
+    }
+
+    private void registerDisposableBeanIfNecessary(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())){
+            registerDisposableBean(beanName, new DisposableBeanAdapter(bean, beanName, beanDefinition));
+        }
+    }
+
+    private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
+
+        try {
+            invokeInitMethods(beanName, wrappedBean, beanDefinition);
+        } catch (Exception e) {
+            throw new BeansException("Invocation of init method of bean '" + beanName + "' failed", e);
+        }
+
+        return applyBeanPostProcessorsAfterInitialization(bean, beanName);
+    }
+
+    private void invokeInitMethods(String beanName, Object bean, BeanDefinition beanDefinition) throws Exception {
+        if (bean instanceof InitializingBean){
+            ((InitializingBean)bean).afterPropertiesSet();
+        }
+
+        String initMethodName = beanDefinition.getInitMethodName();
+        if (StrUtil.isNotEmpty(initMethodName)){
+            Method initMethod = beanDefinition.getBeanClass().getMethod(initMethodName);
+            if (initMethod == null){
+                throw new BeansException("Could not find an init method name '" + initMethodName + "' on bean with name '" + beanName + "'");
+            }
+            initMethod.invoke(bean);
+        }
+    }
+
+    @Override
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()){
+            Object current = processor.postProcessBeforeInitialization(result, beanName);
+            result = current != null ? current : result;
+        }
+        return result;
+    }
+
+    @Override
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()){
+            Object current = processor.postProcessAfterInitialization(result, beanName);
+            result = current != null ? current : result;
+        }
+        return result;
     }
 
     /**

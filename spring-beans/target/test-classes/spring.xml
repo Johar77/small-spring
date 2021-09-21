@@ -8,4 +8,7 @@
         <property name="sex" value="FEMALE"/>
         <property name="userDao" ref="userDao"/>
     </bean>
+
+    <bean class="com.johar.springframework.common.MyBeanFactoryProcessor"/>
+    <bean class="com.johar.springframework.common.MyBeanPostProcessor"/>
 </beans>

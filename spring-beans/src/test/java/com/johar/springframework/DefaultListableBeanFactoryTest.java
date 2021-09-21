@@ -4,6 +4,7 @@ import com.johar.springframework.beans.*;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
 import com.johar.springframework.beans.factory.support.DefaultListableBeanFactory;
 import com.johar.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import com.johar.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -65,6 +66,14 @@ public class DefaultListableBeanFactoryTest {
         reader.loadBeanDefinitions("classpath:spring.xml");
 
         UserService userService = beanFactory.getBean("userService", UserService.class);
+        System.out.println(userService.sayHello("Johar"));
+        System.out.println(userService);
+    }
+
+    @Test
+    public void test_applicationContext(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        UserService userService = applicationContext.getBean("userService", UserService.class);
         System.out.println(userService.sayHello("Johar"));
         System.out.println(userService);
     }

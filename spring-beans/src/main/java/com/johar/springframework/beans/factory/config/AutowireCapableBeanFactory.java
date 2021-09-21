@@ -1,5 +1,6 @@
 package com.johar.springframework.beans.factory.config;
 
+import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.factory.BeanFactory;
 
 /**
@@ -10,4 +11,8 @@ import com.johar.springframework.beans.factory.BeanFactory;
  * @Since: 1.0.0
  */
 public interface AutowireCapableBeanFactory extends BeanFactory {
+
+    Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException;
+
+    Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException;
 }

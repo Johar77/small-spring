@@ -8,6 +8,7 @@ package com.johar.springframework.beans;
  * @Since: 1.0.0
  */
 public class UserService {
+    private String id;
 
     private String who;
 
@@ -76,10 +77,19 @@ public class UserService {
         this.userDao = userDao;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "UserService{" +
-                "who='" + who + '\'' +
+                "id='" + id + '\'' +
+                ", who='" + who + '\'' +
                 ", age=" + age +
                 ", sex=" + sex +
                 ", userDao=" + userDao +
