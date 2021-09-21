@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans>
+    <bean id="userDao" class="com.johar.springframework.beans.UserDao"/>
+
+    <bean id="userService" class="com.johar.springframework.beans.UserService">
+        <property name="who" value="Anna"/>
+        <property name="age" value="21"/>
+        <property name="sex" value="FEMALE"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+</beans>
