@@ -5,8 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.PropertyValue;
 import com.johar.springframework.beans.PropertyValues;
-import com.johar.springframework.beans.factory.DisposableBean;
-import com.johar.springframework.beans.factory.InitializingBean;
+import com.johar.springframework.beans.factory.*;
 import com.johar.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
 import com.johar.springframework.beans.factory.config.BeanPostProcessor;
@@ -24,7 +23,7 @@ import java.util.Optional;
  * @Date: 2021/9/19 17:25
  * @Since: 1.0.0
  */
-public abstract class AbstractAutoWireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
@@ -56,6 +55,20 @@ public abstract class AbstractAutoWireCapableBeanFactory extends AbstractBeanFac
     }
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+        if (bean instanceof Aware){
+            if (bean instanceof BeanFactoryAware){
+                ((BeanFactoryAware)bean).setBeanFactory(this);
+            }
+
+            if (bean instanceof BeanClassLoaderAware){
+                ((BeanClassLoaderAware)bean).setBeanClassLoader(getBeanClassLoader());
+            }
+
+            if (bean instanceof BeanNameAware){
+                ((BeanNameAware)bean).setBeanName(beanName);
+            }
+        }
+
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {

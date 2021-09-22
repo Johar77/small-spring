@@ -1,5 +1,12 @@
 package com.johar.springframework.beans;
 
+import com.johar.springframework.beans.factory.BeanClassLoaderAware;
+import com.johar.springframework.beans.factory.BeanFactory;
+import com.johar.springframework.beans.factory.BeanFactoryAware;
+import com.johar.springframework.beans.factory.BeanNameAware;
+import com.johar.springframework.context.ApplicationContext;
+import com.johar.springframework.context.ApplicationContextAware;
+
 /**
  * @ClassName: UserService
  * @Description: TODO
@@ -7,7 +14,7 @@ package com.johar.springframework.beans;
  * @Date: 2021/9/19 17:33
  * @Since: 1.0.0
  */
-public class UserService {
+public class UserService implements ApplicationContextAware, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
     private String id;
 
     private String who;
@@ -94,5 +101,25 @@ public class UserService {
                 ", sex=" + sex +
                 ", userDao=" + userDao +
                 '}';
+    }
+
+    @Override
+    public void setBeanClassLoader(ClassLoader classLoader) {
+        System.out.println(classLoader);
+    }
+
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        System.out.println(beanFactory);
+    }
+
+    @Override
+    public void setBeanName(String beanName) {
+        System.out.println(beanName);
+    }
+
+    @Override
+    public void setApplicationContextAware(ApplicationContext applicationContext) throws BeansException {
+        System.out.println(applicationContext);
     }
 }

@@ -2,7 +2,6 @@ package com.johar.springframework.beans.factory.support;
 
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.factory.ConfigurableListableBeanFactory;
-import com.johar.springframework.beans.factory.DisposableBean;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
 
 import java.util.HashMap;
@@ -16,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2021/9/19 17:28
  * @Since: 1.0.0
  */
-public class DefaultListableBeanFactory extends AbstractAutoWireCapableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
+public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFactory implements BeanDefinitionRegistry, ConfigurableListableBeanFactory {
 
     private Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
 
