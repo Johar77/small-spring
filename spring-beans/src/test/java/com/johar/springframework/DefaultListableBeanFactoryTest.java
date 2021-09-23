@@ -77,4 +77,18 @@ public class DefaultListableBeanFactoryTest {
         System.out.println(userService.sayHello("Johar"));
         System.out.println(userService);
     }
+
+    @Test
+    public void test_prototype(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        UserService userService1 = applicationContext.getBean("userService", UserService.class);
+        UserService userService2 = applicationContext.getBean("userService", UserService.class);
+
+        System.out.println(userService1);
+        System.out.println(userService2);
+
+        System.out.println(userService1.getCompany().getPosition("1"));
+    }
 }

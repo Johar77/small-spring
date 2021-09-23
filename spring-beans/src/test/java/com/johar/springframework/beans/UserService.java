@@ -6,6 +6,7 @@ import com.johar.springframework.beans.factory.BeanFactoryAware;
 import com.johar.springframework.beans.factory.BeanNameAware;
 import com.johar.springframework.context.ApplicationContext;
 import com.johar.springframework.context.ApplicationContextAware;
+import com.johar.springframework.dao.Company;
 
 /**
  * @ClassName: UserService
@@ -24,6 +25,16 @@ public class UserService implements ApplicationContextAware, BeanNameAware, Bean
     private Sex sex;
 
     private UserDao userDao;
+
+    private Company company;
+
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
 
     public UserService() {
     }
