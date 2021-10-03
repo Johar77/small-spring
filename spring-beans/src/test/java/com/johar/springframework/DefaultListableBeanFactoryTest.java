@@ -7,6 +7,11 @@ import com.johar.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import com.johar.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @ClassName: DefaultListableBeanFactoryTest
  * @Description: TODO
@@ -90,5 +95,23 @@ public class DefaultListableBeanFactoryTest {
         System.out.println(userService2);
 
         System.out.println(userService1.getCompany().getPosition("1"));
+    }
+
+    @Test
+    public void test_double2(){
+        int num = 37;
+        System.out.println(Integer.toBinaryString(num));
+        num |= num >>> 1;
+        System.out.println(Integer.toBinaryString(num));
+        num |= num >>> 2;
+        System.out.println(Integer.toBinaryString(num));
+        num |= num >>> 4;
+        System.out.println(Integer.toBinaryString(num));
+        num |= num >>> 8;
+        System.out.println(Integer.toBinaryString(num));
+        num |= num >>> 16;
+        System.out.println(Integer.toBinaryString(num));
+
+        ConcurrentHashMap hashMap = new ConcurrentHashMap();
     }
 }

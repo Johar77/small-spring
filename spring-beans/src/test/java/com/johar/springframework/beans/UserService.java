@@ -7,6 +7,7 @@ import com.johar.springframework.beans.factory.BeanNameAware;
 import com.johar.springframework.context.ApplicationContext;
 import com.johar.springframework.context.ApplicationContextAware;
 import com.johar.springframework.dao.Company;
+import com.johar.springframework.dao.IUserService;
 
 /**
  * @ClassName: UserService
@@ -15,7 +16,7 @@ import com.johar.springframework.dao.Company;
  * @Date: 2021/9/19 17:33
  * @Since: 1.0.0
  */
-public class UserService implements ApplicationContextAware, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
+public class UserService implements IUserService, ApplicationContextAware, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
     private String id;
 
     private String who;
@@ -59,6 +60,7 @@ public class UserService implements ApplicationContextAware, BeanNameAware, Bean
         this.sex = sex;
     }
 
+    @Override
     public String sayHello(String name){
         return "Hello, " + name + "!";
     }
