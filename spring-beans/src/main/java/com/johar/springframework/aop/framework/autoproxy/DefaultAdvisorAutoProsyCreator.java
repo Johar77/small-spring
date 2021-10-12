@@ -4,6 +4,7 @@ import com.johar.springframework.aop.*;
 import com.johar.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import com.johar.springframework.aop.framework.ProxyFactory;
 import com.johar.springframework.beans.BeansException;
+import com.johar.springframework.beans.PropertyValues;
 import com.johar.springframework.beans.factory.BeanFactory;
 import com.johar.springframework.beans.factory.BeanFactoryAware;
 import com.johar.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
@@ -36,19 +37,14 @@ public class DefaultAdvisorAutoProsyCreator implements InstantiationAwareBeanPos
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
-    }
-
-    @Override
-    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
-        if (isInfrastructureClass(beanClass)){
+        if (isInfrastructureClass(bean.getClass())){
             return null;
         }
 
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
         for (AspectJExpressionPointcutAdvisor advisor : advisors){
             ClassFilter classFilter = advisor.getPointcut().getClassFilter();
-            if (!classFilter.matches(beanClass)){
+            if (!classFilter.matches(bean.getClass())){
                 continue;
             }
 
@@ -56,7 +52,7 @@ public class DefaultAdvisorAutoProsyCreator implements InstantiationAwareBeanPos
 
             TargetSource targetSource = null;
             try{
-                targetSource = new TargetSource(beanClass.getDeclaredConstructor().newInstance());
+                targetSource = new TargetSource(bean.getClass().getDeclaredConstructor().newInstance());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -69,6 +65,21 @@ public class DefaultAdvisorAutoProsyCreator implements InstantiationAwareBeanPos
             return new ProxyFactory(advisedSupport).getProxy();
         }
 
+        return null;
+    }
+
+    @Override
+    public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
+        return true;
+    }
+
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) {
+        return pvs;
+    }
+
+    @Override
+    public Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
         return null;
     }
 

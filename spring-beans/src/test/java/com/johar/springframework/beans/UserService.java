@@ -4,10 +4,12 @@ import com.johar.springframework.beans.factory.BeanClassLoaderAware;
 import com.johar.springframework.beans.factory.BeanFactory;
 import com.johar.springframework.beans.factory.BeanFactoryAware;
 import com.johar.springframework.beans.factory.BeanNameAware;
+import com.johar.springframework.beans.factory.annotation.Value;
 import com.johar.springframework.context.ApplicationContext;
 import com.johar.springframework.context.ApplicationContextAware;
 import com.johar.springframework.dao.Company;
 import com.johar.springframework.dao.IUserService;
+import com.johar.springframework.stereotype.Component;
 
 import java.util.Random;
 
@@ -18,9 +20,11 @@ import java.util.Random;
  * @Date: 2021/9/19 17:33
  * @Since: 1.0.0
  */
+@Component("userService")
 public class UserService implements IUserService, ApplicationContextAware, BeanNameAware, BeanFactoryAware, BeanClassLoaderAware {
     private String id;
 
+    @Value("${token}")
     private String who;
 
     private int age;

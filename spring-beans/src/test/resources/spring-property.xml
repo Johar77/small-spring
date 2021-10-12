@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans >
+
+    <bean class="com.johar.springframework.beans.factory.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:token.properties"/>
+    </bean>
+
+    <bean id="userService" class="com.johar.springframework.beans.UserService">
+        <property name="who" value="${token}"/>
+    </bean>
+</beans>

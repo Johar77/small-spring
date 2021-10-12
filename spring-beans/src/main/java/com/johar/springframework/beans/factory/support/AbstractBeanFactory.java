@@ -9,6 +9,7 @@ import com.johar.springframework.beans.factory.config.BeanDefinition;
 import com.johar.springframework.beans.factory.config.BeanPostProcessor;
 import com.johar.springframework.beans.factory.config.ConfigurableBeanFactory;
 import com.johar.springframework.utils.ClassUtils;
+import com.johar.springframework.utils.StringValueResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,8 @@ import java.util.List;
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    private final List<StringValueResolver> embeddedValueResolvers = new ArrayList<>();
 
     private final ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
@@ -81,5 +84,20 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
     public ClassLoader getBeanClassLoader() {
         return beanClassLoader;
+    }
+
+    @Override
+    public void addEmbeddedValueResolver(StringValueResolver valueResolver) {
+        this.embeddedValueResolvers.add(valueResolver);
+    }
+
+    @Override
+    public String resolveEmbeddedValue(String value) {
+        String result = value;
+        for (StringValueResolver resolver : this.embeddedValueResolvers){
+            result = resolver.resolveStringValue(result);
+        }
+
+        return result;
     }
 }

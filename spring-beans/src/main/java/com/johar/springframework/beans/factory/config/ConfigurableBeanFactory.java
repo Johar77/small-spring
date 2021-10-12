@@ -1,6 +1,7 @@
 package com.johar.springframework.beans.factory.config;
 
 import com.johar.springframework.beans.factory.HierarchicalBeanFactory;
+import com.johar.springframework.utils.StringValueResolver;
 
 /**
  * @ClassName: ConfigurableBeanFactory
@@ -20,4 +21,8 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, Single
      * 销毁单例对象
      */
     void destroySingletons();
+
+    void addEmbeddedValueResolver(StringValueResolver valueResolver);
+
+    String resolveEmbeddedValue(String value);
 }

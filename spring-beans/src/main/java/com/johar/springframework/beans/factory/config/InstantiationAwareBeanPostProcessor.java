@@ -1,6 +1,7 @@
 package com.johar.springframework.beans.factory.config;
 
 import com.johar.springframework.beans.BeansException;
+import com.johar.springframework.beans.PropertyValues;
 
 /**
  * @ClassName: InstantiationAwareBeanPostProcessor
@@ -19,4 +20,8 @@ public interface InstantiationAwareBeanPostProcessor extends BeanPostProcessor{
      * @throws BeansException
      */
     Object postProcessBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException;
+
+    boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException;
+
+    PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName);
 }
