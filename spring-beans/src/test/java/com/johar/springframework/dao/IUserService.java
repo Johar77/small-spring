@@ -9,4 +9,8 @@ package com.johar.springframework.dao;
  */
 public interface IUserService {
     String sayHello(String name);
+
+    String queryUserInfo();
+
+    String register(String userName);
 }

@@ -9,6 +9,8 @@ import com.johar.springframework.context.ApplicationContextAware;
 import com.johar.springframework.dao.Company;
 import com.johar.springframework.dao.IUserService;
 
+import java.util.Random;
+
 /**
  * @ClassName: UserService
  * @Description: TODO
@@ -134,5 +136,27 @@ public class UserService implements IUserService, ApplicationContextAware, BeanN
     @Override
     public void setApplicationContextAware(ApplicationContext applicationContext) throws BeansException {
         System.out.println(applicationContext);
+    }
+
+    @Override
+    public String queryUserInfo() {
+        try{
+            Thread.sleep(new Random(1).nextInt(100));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return "Johar, 大笨蛋，重庆";
+    }
+
+    @Override
+    public String register(String userName) {
+        try {
+            Thread.sleep(new Random(1).nextInt(100));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return "注册用户: " + userName + " success!";
     }
 }

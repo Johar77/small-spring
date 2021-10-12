@@ -6,6 +6,7 @@ import com.johar.springframework.aop.aspectj.AspectJExpressionPointcut;
 import com.johar.springframework.aop.framework.Cglib2AopProxy;
 import com.johar.springframework.aop.framework.JdkDynamicAopProxy;
 import com.johar.springframework.beans.UserService;
+import com.johar.springframework.context.support.ClassPathXmlApplicationContext;
 import com.johar.springframework.dao.Company;
 import com.johar.springframework.dao.IUserService;
 import com.johar.springframework.interceptor.UserServiceInterceptor;
@@ -69,5 +70,12 @@ public class AopTest {
 
         IUserService proxy_cglib = (IUserService) new Cglib2AopProxy(advisedSupport).getProxy();
         System.out.println("result: " + proxy_cglib.sayHello("Anna"));
+    }
+
+    @Test
+    public void test_xml(){
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        System.out.println(userService.queryUserInfo());
     }
 }
