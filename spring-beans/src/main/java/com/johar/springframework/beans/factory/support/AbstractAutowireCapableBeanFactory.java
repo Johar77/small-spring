@@ -2,11 +2,13 @@ package com.johar.springframework.beans.factory.support;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.johar.springframework.beans.BeansException;
 import com.johar.springframework.beans.PropertyValue;
 import com.johar.springframework.beans.PropertyValues;
 import com.johar.springframework.beans.factory.*;
 import com.johar.springframework.beans.factory.config.*;
+import com.johar.springframework.core.convert.support.ConversionService;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -24,36 +26,80 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
+
+
     @Override
     protected Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) {
+        Object bean = resolveBeforeInstantiation(beanName, beanDefinition);;
+        if (bean != null){
+            return bean;
+        }
+
+        return doCreateBean(beanName, beanDefinition, args);
+    }
+
+    protected Object doCreateBean(String beanName, BeanDefinition beanDefinition, Object[] args){
         Object bean = null;
         try{
-            // 判断是否返回代理Bean 对象
-            bean = resolveBeforeInstantiation(beanName, beanDefinition);
-            if (bean != null){
+            bean = createBeanInstance(beanDefinition, beanName, args);
+
+            if (beanDefinition.isSingleton()){
+                Object finalBean = bean;
+                addSingletonFactory(beanName, () -> getEarlyBeanReference(beanName, beanDefinition, finalBean));
+            }
+
+            boolean continueWithPropertyPopulation = applyBeanPostProcessorsAfterInstantiation(beanName, bean);
+            if (!continueWithPropertyPopulation){
                 return bean;
             }
-            // 创建实例
-            bean = createBeanInstance(beanDefinition, beanName, args);
 
             applyBeanPostProcessorsBeforeApplyingPropertyValues(beanName, bean, beanDefinition);
 
-            // 填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
 
             bean = initializeBean(beanName, bean, beanDefinition);
-        } catch (Exception e) {
-            throw new BeansException("Instantiation of bean[" + beanName + "] failed: " + e.getMessage(), e);
+        } catch (Exception e){
+            throw new BeansException("Instantiation of bean failed", e);
         }
 
-        // 注册实现DisposableBean 接口 bean对象
         registerDisposableBeanIfNecessary(beanName, bean, beanDefinition);
 
+        Object exposedObject = bean;
         if (beanDefinition.isSingleton()){
-            registerSingleton(beanName, bean);
+            exposedObject = getSingleton(beanName);
+            registerSingleton(beanName, exposedObject);
         }
 
-        return bean;
+        return exposedObject;
+    }
+
+    private boolean applyBeanPostProcessorsAfterInstantiation(String beanName, Object bean) {
+        boolean continueWithPropertyPopulation = true;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()){
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+                InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor = (InstantiationAwareBeanPostProcessor) beanPostProcessor;
+                if (!instantiationAwareBeanPostProcessor.postProcessAfterInstantiation(bean, beanName)){
+                    continueWithPropertyPopulation = false;
+                    break;
+                }
+            }
+        }
+
+        return continueWithPropertyPopulation;
+    }
+
+    protected Object getEarlyBeanReference(String beanName, BeanDefinition beanDefinition, Object bean){
+        Object exposedObject = bean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()){
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+                exposedObject = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).getEarlyBeanReference(exposedObject, beanName);
+                if (exposedObject == null){
+                    return exposedObject;
+                }
+            }
+        }
+
+        return exposedObject;
     }
 
     protected void applyBeanPostProcessorsBeforeApplyingPropertyValues(String beanName, Object bean, BeanDefinition beanDefinition){
@@ -119,6 +165,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
         }
 
+        // 执行BeanPostProcessor Before处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 
         try {
@@ -127,6 +174,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             throw new BeansException("Invocation of init method of bean '" + beanName + "' failed", e);
         }
 
+        // 执行BeanPostProcessor After处理
         return applyBeanPostProcessorsAfterInitialization(bean, beanName);
     }
 
@@ -179,8 +227,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 Object value = propertyValue.getValue();
                 if (value instanceof BeanReference){
                     BeanReference beanReference = (BeanReference) value;
-                    // TODO 考虑循环依赖
                     value = getBean(beanReference.getBeanName());
+                } else {
+                    Class<?> sourceType = value.getClass();
+                    Class<?> tagetType = (Class<?>) TypeUtil.getFieldType(bean.getClass(), name);
+                    ConversionService conversionService = getConversionService();
+                    if (conversionService != null){
+                        if (conversionService.canConvert(sourceType, tagetType)){
+                            value = conversionService.convert(value, tagetType);
+                        }
+                    }
                 }
 
                 BeanUtil.setFieldValue(bean, name, value);

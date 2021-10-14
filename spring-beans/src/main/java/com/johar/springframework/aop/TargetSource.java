@@ -1,5 +1,7 @@
 package com.johar.springframework.aop;
 
+import com.johar.springframework.utils.ClassUtils;
+
 /**
  * @ClassName: TargetSource
  * @Description: TODO
@@ -15,7 +17,9 @@ public class TargetSource {
     }
 
     public Class<?>[] getTargetClass() {
-        return this.target.getClass().getInterfaces();
+        Class<?> clazz = this.target.getClass();
+        clazz = ClassUtils.isCglibProxyClass(clazz) ? clazz.getSuperclass() : clazz;
+        return clazz.getInterfaces();
     }
 
     public Object getTarget(){

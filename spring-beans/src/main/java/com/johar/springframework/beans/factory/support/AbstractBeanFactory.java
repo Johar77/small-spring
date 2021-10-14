@@ -8,6 +8,7 @@ import com.johar.springframework.beans.factory.FactoryBeanRegistrySupport;
 import com.johar.springframework.beans.factory.config.BeanDefinition;
 import com.johar.springframework.beans.factory.config.BeanPostProcessor;
 import com.johar.springframework.beans.factory.config.ConfigurableBeanFactory;
+import com.johar.springframework.core.convert.support.ConversionService;
 import com.johar.springframework.utils.ClassUtils;
 import com.johar.springframework.utils.StringValueResolver;
 
@@ -29,10 +30,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
     private final ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
+    private ConversionService conversionService;
+
     @Override
     public Object getBean(String name) {
         return doGetBean(name, null);
     }
+
+    @Override
+    public boolean containsBean(String name) {
+        return containsBeanDefinition(name);
+    }
+
+    protected abstract boolean containsBeanDefinition(String beanName);
 
     @Override
     public Object getBean(String name, Object... args) {
@@ -99,5 +109,15 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
         }
 
         return result;
+    }
+
+    @Override
+    public ConversionService getConversionService() {
+        return conversionService;
+    }
+
+    @Override
+    public void setConversionService(ConversionService conversionService) {
+        this.conversionService = conversionService;
     }
 }

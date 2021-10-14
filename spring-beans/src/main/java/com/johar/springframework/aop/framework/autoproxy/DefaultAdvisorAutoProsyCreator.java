@@ -38,7 +38,7 @@ public class DefaultAdvisorAutoProsyCreator implements InstantiationAwareBeanPos
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (isInfrastructureClass(bean.getClass())){
-            return null;
+            return bean;
         }
 
         Collection<AspectJExpressionPointcutAdvisor> advisors = beanFactory.getBeansOfType(AspectJExpressionPointcutAdvisor.class).values();
@@ -65,7 +65,7 @@ public class DefaultAdvisorAutoProsyCreator implements InstantiationAwareBeanPos
             return new ProxyFactory(advisedSupport).getProxy();
         }
 
-        return null;
+        return bean;
     }
 
     @Override

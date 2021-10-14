@@ -22,6 +22,14 @@ public class MethodBeforeAdviceInterceptor implements MethodInterceptor {
         this.advice = advice;
     }
 
+    public MethodBeforeAdvice getAdvice() {
+        return advice;
+    }
+
+    public void setAdvice(MethodBeforeAdvice advice) {
+        this.advice = advice;
+    }
+
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         this.advice.before(methodInvocation.getMethod(), methodInvocation.getArguments(), methodInvocation.getThis());
